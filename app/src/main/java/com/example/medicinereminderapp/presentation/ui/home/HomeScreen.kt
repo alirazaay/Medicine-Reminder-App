@@ -133,8 +133,10 @@ fun HomeScreen(
         parseTimeToMinutes(reminder.time)?.let { minutes -> minutes to reminder }
     }.sortedBy { it.first }
 
-    val upcomingReminder = remindersWithMinutes.firstOrNull { it.first >= nowMinutes }?.second
-        ?: remindersWithMinutes.firstOrNull()?.second
+    val pendingReminders = remindersWithMinutes.filter { it.second.status != LogStatus.TAKEN }
+
+    val upcomingReminder = pendingReminders.firstOrNull { it.first >= nowMinutes }?.second
+        ?: pendingReminders.firstOrNull()?.second
 
     val adherenceProgress = if (todayReminders.isEmpty()) 0f else {
         val taken = todayReminders.count { it.status == LogStatus.TAKEN }
@@ -154,8 +156,6 @@ fun HomeScreen(
             else -> "Hello"
         }
     }
-
-    val displayName = "User"
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -241,7 +241,7 @@ fun HomeScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
-                    IconButton(onClick = onNavigateToSettings) {
+                    IconButton(onClick = onNavigateToHistory) {
                         Icon(
                             imageVector = Icons.Default.Notifications,
                             contentDescription = "Notifications"
@@ -253,7 +253,7 @@ fun HomeScreen(
             item {
                 Column {
                     Text(
-                        text = "$greeting, $displayName",
+                        text = greeting,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface

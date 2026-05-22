@@ -50,6 +50,22 @@ object NotificationHelper {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        // Full Screen Intent for Alarm
+        val fullScreenIntent = Intent(context, com.example.medicinereminderapp.presentation.ui.alarm.AlarmActivity::class.java).apply {
+            putExtra("MEDICINE_ID", medicineId)
+            putExtra("MEDICINE_NAME", medicineName)
+            putExtra("MEDICINE_DOSAGE", dosage)
+            putExtra("MEDICINE_INSTRUCTIONS", instructions)
+            putExtra("SCHEDULED_TIME_MS", scheduledTimeMs)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION
+        }
+        val fullScreenPendingIntent = PendingIntent.getActivity(
+            context,
+            medicineId.toInt() + 3000,
+            fullScreenIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         // "Mark as Taken" action intent
         val takeIntent = Intent(context, AlarmReceiver::class.java).apply {
             action = "com.example.medicinereminderapp.ACTION_TAKE"
@@ -92,6 +108,7 @@ object NotificationHelper {
             .setContentText("Take $medicineName ($dosage) - $instructions")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
+            .setFullScreenIntent(fullScreenPendingIntent, true)
             .setSound(soundUri)
             .setVibrate(longArrayOf(0, 500, 250, 500))
             .setAutoCancel(true)

@@ -10,6 +10,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.medicinereminderapp.data.local.AppDatabase
@@ -40,7 +42,9 @@ class MainActivity : ComponentActivity() {
         val settingsViewModel: SettingsViewModel by viewModels { factory }
 
         setContent {
-            MedicineReminderAppTheme {
+            val settings by settingsViewModel.settings.collectAsState()
+            
+            MedicineReminderAppTheme(darkTheme = settings.isDarkMode) {
                 val navController = rememberNavController()
                 val snackbarHostState = remember { SnackbarHostState() }
 
