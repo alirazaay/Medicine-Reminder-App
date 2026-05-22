@@ -11,14 +11,17 @@ import com.example.medicinereminderapp.presentation.ui.add_edit.AddEditMedicineS
 import com.example.medicinereminderapp.presentation.ui.detail.MedicineDetailScreen
 import com.example.medicinereminderapp.presentation.ui.home.HomeScreen
 import com.example.medicinereminderapp.presentation.ui.log.ReminderLogScreen
+import com.example.medicinereminderapp.presentation.ui.settings.SettingsScreen
 import com.example.medicinereminderapp.presentation.viewmodel.MedicineViewModel
 import com.example.medicinereminderapp.presentation.viewmodel.ReminderLogViewModel
+import com.example.medicinereminderapp.presentation.viewmodel.SettingsViewModel
 
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
     medicineViewModel: MedicineViewModel,
     reminderLogViewModel: ReminderLogViewModel,
+    settingsViewModel: SettingsViewModel,
     snackbarHostState: SnackbarHostState
 ) {
     NavHost(
@@ -33,6 +36,9 @@ fun AppNavGraph(
                 },
                 onNavigateToDetail = { id ->
                     navController.navigate(ScreenRoutes.MedicineDetail.passMedicineId(id))
+                },
+                onNavigateToSettings = {
+                    navController.navigate(ScreenRoutes.Settings.route)
                 }
             )
         }
@@ -77,6 +83,13 @@ fun AppNavGraph(
         composable(route = ScreenRoutes.ReminderLog.route) {
             ReminderLogScreen(
                 viewModel = reminderLogViewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(route = ScreenRoutes.Settings.route) {
+            SettingsScreen(
+                viewModel = settingsViewModel,
                 onNavigateBack = { navController.popBackStack() }
             )
         }

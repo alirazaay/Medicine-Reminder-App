@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,12 +21,22 @@ import com.example.medicinereminderapp.presentation.viewmodel.MedicineViewModel
 fun HomeScreen(
     viewModel: MedicineViewModel,
     onNavigateToAddEdit: () -> Unit,
-    onNavigateToDetail: (Long) -> Unit
+    onNavigateToDetail: (Long) -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
     Scaffold(
-        topBar = { StandardTopAppBar(title = "Medicines") },
+        topBar = {
+            StandardTopAppBar(
+                title = "Medicine Reminder",
+                actions = {
+                    IconButton(onClick = onNavigateToSettings) {
+                        Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = onNavigateToAddEdit) {
                 Icon(Icons.Default.Add, contentDescription = "Add Medicine")

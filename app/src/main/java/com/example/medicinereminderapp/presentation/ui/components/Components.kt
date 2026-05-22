@@ -17,7 +17,8 @@ import com.example.medicinereminderapp.data.local.entity.ReminderLogEntity
 fun StandardTopAppBar(
     title: String,
     showBackArrow: Boolean = false,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
     TopAppBar(
         title = { Text(text = title) },
@@ -28,6 +29,7 @@ fun StandardTopAppBar(
                 }
             }
         },
+        actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,

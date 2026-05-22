@@ -13,4 +13,5 @@ sealed class ScreenRoutes(val route: String) {
         }
     }
     object ReminderLog : ScreenRoutes("reminder_log_screen")
+    object Settings : ScreenRoutes("settings_screen")
 }
