@@ -15,7 +15,7 @@ object AlarmScheduler {
     private const val TAG = "AlarmScheduler"
 
     @SuppressLint("ScheduleExactAlarm")
-    fun scheduleAlarmsForMedicine(context: Context, medicine: Medicine) {
+    fun scheduleAlarmsForMedicine(context: Context, medicine: MedicineEntity) {
         if (!medicine.isActive) {
             cancelAlarmsForMedicine(context, medicine)
             return
@@ -74,7 +74,7 @@ object AlarmScheduler {
         }
     }
 
-    fun cancelAlarmsForMedicine(context: Context, medicine: Medicine) {
+    fun cancelAlarmsForMedicine(context: Context, medicine: MedicineEntity) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         medicine.reminderTimes.forEachIndexed { index, timeStr ->
             val intent = Intent(context, AlarmReceiver::class.java)
@@ -97,7 +97,7 @@ object AlarmScheduler {
         return (medicineId.toInt() * 100) + timeIndex
     }
 
-    fun calculateNextTriggerTime(medicine: Medicine, timeStr: String): Long {
+    fun calculateNextTriggerTime(medicine: MedicineEntity, timeStr: String): Long {
         val timeParts = timeStr.split(":")
         if (timeParts.size < 2) return -1L
         val hour = timeParts[0].toIntOrNull() ?: return -1L

@@ -1,11 +1,12 @@
 package com.example.medicinereminderapp.domain.model
 
 enum class MedicineType {
-    PILL,
+    TABLET,
     CAPSULE,
     SYRUP,
     INJECTION,
-    DROPS,
     INHALER,
+    DROPS,
+    CREAM,
     OTHER
 }

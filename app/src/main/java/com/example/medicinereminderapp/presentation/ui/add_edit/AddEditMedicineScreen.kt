@@ -26,7 +26,7 @@ fun AddEditMedicineScreen(
     
     var name by remember { mutableStateOf("") }
     var dosage by remember { mutableStateOf("") }
-    var type by remember { mutableStateOf(MedicineType.PILL) }
+    var type by remember { mutableStateOf(MedicineType.TABLET) }
     var instructions by remember { mutableStateOf("") }
 
     LaunchedEffect(medicineId) {
