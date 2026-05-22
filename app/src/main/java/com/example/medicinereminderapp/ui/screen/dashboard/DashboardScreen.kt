@@ -23,8 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.medicinereminderapp.data.model.LogStatus
-import com.example.medicinereminderapp.data.model.MedicineType
+import com.example.medicinereminderapp.domain.model.LogStatus
+import com.example.medicinereminderapp.domain.model.MedicineType
 import com.example.medicinereminderapp.ui.theme.*
 import com.example.medicinereminderapp.util.DateTimeUtils
 import java.util.Calendar
@@ -115,7 +115,7 @@ fun DashboardScreen(
                     val isToday = DateTimeUtils.getStartOfDay(dateMillis) == DateTimeUtils.getTodayMillis()
                     
                     val dayName = DateTimeUtils.getDayOfWeekLetter(dateMillis)
-                    val dayNum = SimpleDateFormat("d", java.util.Locale.getDefault()).format(java.util.Date(dateMillis))
+                    val dayNum = java.text.SimpleDateFormat("d", java.util.Locale.getDefault()).format(java.util.Date(dateMillis))
 
                     Column(
                         modifier = Modifier

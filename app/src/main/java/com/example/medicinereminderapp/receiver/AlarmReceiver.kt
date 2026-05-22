@@ -5,10 +5,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.example.medicinereminderapp.data.local.db.AppDatabase
-import com.example.medicinereminderapp.data.model.LogStatus
-import com.example.medicinereminderapp.data.model.ReminderLog
+import com.example.medicinereminderapp.data.local.AppDatabase
+import com.example.medicinereminderapp.data.local.entity.ReminderLogEntity
 import com.example.medicinereminderapp.data.repository.MedicineRepositoryImpl
+import com.example.medicinereminderapp.domain.model.LogStatus
 import com.example.medicinereminderapp.service.NotificationHelper
 import com.example.medicinereminderapp.util.AlarmScheduler
 import kotlinx.coroutines.CoroutineScope
@@ -30,7 +30,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val notificationId = intent.getIntExtra("NOTIFICATION_ID", -1)
 
         val database = AppDatabase.getDatabase(context.applicationContext)
-        val repository = MedicineRepositoryImpl(database.medicineDao(), database.reminderLogDao())
+        val repository = MedicineRepositoryImpl(database.medicineDao, database.reminderLogDao)
 
         Log.d(TAG, "onReceive: action=$action, medicineId=$medicineId, medicineName=$medicineName")
 
@@ -48,7 +48,7 @@ class AlarmReceiver : BroadcastReceiver() {
                     // Check if a log already exists for this scheduled time (avoid double insertion)
                     val existingLog = repository.getLogForScheduledTime(medicineId, scheduledTimeMs)
                     if (existingLog == null) {
-                        val log = ReminderLog(
+                        val log = ReminderLogEntity(
                             medicineId = medicineId,
                             medicineName = medicineName,
                             dosage = dosage,
@@ -56,14 +56,14 @@ class AlarmReceiver : BroadcastReceiver() {
                             status = status,
                             actionDateTime = System.currentTimeMillis()
                         )
-                        repository.insertLog(log)
+                        repository.insertReminderLog(log)
                         Log.d(TAG, "Logged medication status $status for $medicineName scheduled at $scheduledTimeMs")
                     } else {
                         val updatedLog = existingLog.copy(
                             status = status,
                             actionDateTime = System.currentTimeMillis()
                         )
-                        repository.updateLog(updatedLog)
+                        repository.updateReminderLog(updatedLog)
                         Log.d(TAG, "Updated existing log to status $status for $medicineName scheduled at $scheduledTimeMs")
                     }
                 } catch (e: Exception) {
@@ -93,14 +93,14 @@ class AlarmReceiver : BroadcastReceiver() {
                             // Insert a PENDING log for this scheduled time so it shows up in dashboard agenda
                             val existingLog = repository.getLogForScheduledTime(medicineId, scheduledTimeMs)
                             if (existingLog == null) {
-                                val pendingLog = ReminderLog(
+                                val pendingLog = ReminderLogEntity(
                                     medicineId = medicineId,
                                     medicineName = medicine.name,
                                     dosage = medicine.dosage,
                                     scheduledDateTime = scheduledTimeMs,
                                     status = LogStatus.PENDING
                                 )
-                                repository.insertLog(pendingLog)
+                                repository.insertReminderLog(pendingLog)
                             }
                         }
                     } catch (e: Exception) {

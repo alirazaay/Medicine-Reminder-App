@@ -5,11 +5,11 @@ import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medicinereminderapp.data.local.db.AppDatabase
-import com.example.medicinereminderapp.data.model.Medicine
-import com.example.medicinereminderapp.data.model.MedicineType
-import com.example.medicinereminderapp.data.repository.MedicineRepository
+import com.example.medicinereminderapp.data.local.AppDatabase
+import com.example.medicinereminderapp.data.local.entity.MedicineEntity
 import com.example.medicinereminderapp.data.repository.MedicineRepositoryImpl
+import com.example.medicinereminderapp.domain.model.MedicineType
+import com.example.medicinereminderapp.domain.repository.MedicineRepository
 import com.example.medicinereminderapp.util.AlarmScheduler
 import com.example.medicinereminderapp.util.DateTimeUtils
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class AddEditViewModel(application: Application) : AndroidViewModel(application) {
     private val TAG = "AddEditViewModel"
     private val database = AppDatabase.getDatabase(application)
-    private val repository: MedicineRepository = MedicineRepositoryImpl(database.medicineDao(), database.reminderLogDao())
+    private val repository: MedicineRepository = MedicineRepositoryImpl(database.medicineDao, database.reminderLogDao)
 
     var medicineId by mutableStateOf(-1L)
         private set
@@ -113,7 +113,7 @@ class AddEditViewModel(application: Application) : AndroidViewModel(application)
                     }
                 }
 
-                val medicine = Medicine(
+                val medicine = MedicineEntity(
                     id = if (medicineId == -1L) 0L else medicineId,
                     name = name.trim(),
                     dosage = dosage.trim(),

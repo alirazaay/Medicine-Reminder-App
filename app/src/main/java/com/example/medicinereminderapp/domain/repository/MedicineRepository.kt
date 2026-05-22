@@ -12,7 +12,9 @@ interface MedicineRepository {
     suspend fun deleteMedicine(medicine: MedicineEntity)
     fun getAllMedicines(): Flow<List<MedicineEntity>>
     suspend fun getMedicineById(id: Long): MedicineEntity?
+    fun getMedicineByIdFlow(id: Long): Flow<MedicineEntity?>
     fun getActiveMedicines(): Flow<List<MedicineEntity>>
+    suspend fun getActiveMedicinesList(): List<MedicineEntity>
 
     // Reminder Logs
     suspend fun insertReminderLog(log: ReminderLogEntity): Long
@@ -23,4 +25,6 @@ interface MedicineRepository {
     suspend fun getReminderLogById(id: Long): ReminderLogEntity?
     fun getReminderLogsForDay(startOfDay: Long, endOfDay: Long): Flow<List<ReminderLogEntity>>
     suspend fun updateLogStatus(logId: Long, status: LogStatus, actionTime: Long)
+    fun getLogsForMedicine(medicineId: Long): Flow<List<ReminderLogEntity>>
+    suspend fun getLogForScheduledTime(medicineId: Long, scheduledTime: Long): ReminderLogEntity?
 }

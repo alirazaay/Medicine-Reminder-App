@@ -15,7 +15,7 @@ data class MedicineEntity(
     val startDate: Long,
     val endDate: Long?,
     val frequency: String,
-    val frequencyPattern: String,
+    val frequencyPattern: String?,
     val reminderTimes: List<String>,
     val isActive: Boolean = true
 )

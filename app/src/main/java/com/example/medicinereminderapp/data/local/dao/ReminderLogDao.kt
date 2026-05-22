@@ -35,4 +35,11 @@ interface ReminderLogDao {
 
     @Query("UPDATE reminder_logs SET status = :status, actionDateTime = :actionTime WHERE id = :logId")
     suspend fun updateLogStatus(logId: Long, status: LogStatus, actionTime: Long)
+
+    @Query("SELECT * FROM reminder_logs WHERE medicineId = :medicineId ORDER BY scheduledDateTime DESC")
+    fun getLogsForMedicine(medicineId: Long): Flow<List<ReminderLogEntity>>
+
+    @Query("SELECT * FROM reminder_logs WHERE medicineId = :medicineId AND scheduledDateTime = :scheduledTime LIMIT 1")
+    suspend fun getLogForScheduledTime(medicineId: Long, scheduledTime: Long): ReminderLogEntity?
 }
+

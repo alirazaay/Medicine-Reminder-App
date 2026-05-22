@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import com.example.medicinereminderapp.data.model.Medicine
+import com.example.medicinereminderapp.data.local.entity.MedicineEntity
 import com.example.medicinereminderapp.receiver.AlarmReceiver
 import java.util.Calendar
 

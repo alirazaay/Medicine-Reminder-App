@@ -3,11 +3,11 @@ package com.example.medicinereminderapp.ui.screen.detail
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medicinereminderapp.data.local.db.AppDatabase
-import com.example.medicinereminderapp.data.model.LogStatus
-import com.example.medicinereminderapp.data.model.Medicine
-import com.example.medicinereminderapp.data.repository.MedicineRepository
+import com.example.medicinereminderapp.data.local.AppDatabase
+import com.example.medicinereminderapp.data.local.entity.MedicineEntity
 import com.example.medicinereminderapp.data.repository.MedicineRepositoryImpl
+import com.example.medicinereminderapp.domain.model.LogStatus
+import com.example.medicinereminderapp.domain.repository.MedicineRepository
 import com.example.medicinereminderapp.util.AlarmScheduler
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -15,11 +15,11 @@ import kotlinx.coroutines.launch
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
     private val database = AppDatabase.getDatabase(application)
-    private val repository: MedicineRepository = MedicineRepositoryImpl(database.medicineDao(), database.reminderLogDao())
+    private val repository: MedicineRepository = MedicineRepositoryImpl(database.medicineDao, database.reminderLogDao)
 
     private val _medicineId = MutableStateFlow(-1L)
 
-    val medicine: StateFlow<Medicine?> = _medicineId
+    val medicine: StateFlow<MedicineEntity?> = _medicineId
         .flatMapLatest { id ->
             if (id == -1L) flowOf(null)
             else repository.getMedicineByIdFlow(id)
@@ -41,7 +41,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         _medicineId.value = id
     }
 
-    fun toggleMedicineActive(medicine: Medicine) {
+    fun toggleMedicineActive(medicine: MedicineEntity) {
         val updated = medicine.copy(isActive = !medicine.isActive)
         viewModelScope.launch {
             repository.updateMedicine(updated)
@@ -53,7 +53,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun deleteMedicine(medicine: Medicine) {
+    fun deleteMedicine(medicine: MedicineEntity) {
         viewModelScope.launch {
             // Cancel system alarms first
             AlarmScheduler.cancelAlarmsForMedicine(getApplication(), medicine)

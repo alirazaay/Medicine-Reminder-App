@@ -25,7 +25,14 @@ interface MedicineDao {
 
     @Query("SELECT * FROM medicines WHERE id = :id")
     suspend fun getMedicineById(id: Long): MedicineEntity?
+
+    @Query("SELECT * FROM medicines WHERE id = :id")
+    fun getMedicineByIdFlow(id: Long): Flow<MedicineEntity?>
     
     @Query("SELECT * FROM medicines WHERE isActive = 1")
     fun getActiveMedicines(): Flow<List<MedicineEntity>>
+
+    @Query("SELECT * FROM medicines WHERE isActive = 1")
+    suspend fun getActiveMedicinesList(): List<MedicineEntity>
 }
+

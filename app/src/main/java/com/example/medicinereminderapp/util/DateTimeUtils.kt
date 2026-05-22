@@ -1,6 +1,6 @@
 package com.example.medicinereminderapp.util
 
-import com.example.medicinereminderapp.data.model.Medicine
+import com.example.medicinereminderapp.data.local.entity.MedicineEntity
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -70,7 +70,7 @@ object DateTimeUtils {
         return calendar.timeInMillis
     }
 
-    fun isScheduledOnDate(medicine: Medicine, dateMillis: Long): Boolean {
+    fun isScheduledOnDate(medicine: MedicineEntity, dateMillis: Long): Boolean {
         val dateStart = getStartOfDay(dateMillis)
         
         // Ensure date falls within start and end date course

@@ -3,12 +3,13 @@ package com.example.medicinereminderapp.ui.screen.dashboard
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medicinereminderapp.data.local.db.AppDatabase
+import com.example.medicinereminderapp.data.local.AppDatabase
+import com.example.medicinereminderapp.data.local.entity.ReminderLogEntity
 import com.example.medicinereminderapp.data.local.preferences.UserPreferences
-import com.example.medicinereminderapp.data.model.LogStatus
-import com.example.medicinereminderapp.data.model.ReminderLog
-import com.example.medicinereminderapp.data.repository.MedicineRepository
 import com.example.medicinereminderapp.data.repository.MedicineRepositoryImpl
+import com.example.medicinereminderapp.domain.model.LogStatus
+import com.example.medicinereminderapp.domain.model.MedicineType
+import com.example.medicinereminderapp.domain.repository.MedicineRepository
 import com.example.medicinereminderapp.util.DateTimeUtils
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -18,7 +19,7 @@ data class ReminderItem(
     val medicineId: Long,
     val name: String,
     val dosage: String,
-    val type: com.example.medicinereminderapp.data.model.MedicineType,
+    val type: MedicineType,
     val instructions: String,
     val scheduledTime: String,
     val scheduledDateTimeMs: Long,
@@ -29,7 +30,7 @@ data class ReminderItem(
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
 
     private val database = AppDatabase.getDatabase(application)
-    private val repository: MedicineRepository = MedicineRepositoryImpl(database.medicineDao(), database.reminderLogDao())
+    private val repository: MedicineRepository = MedicineRepositoryImpl(database.medicineDao, database.reminderLogDao)
     private val preferences = UserPreferences(application)
 
     private val _selectedDate = MutableStateFlow(DateTimeUtils.getTodayMillis())
@@ -45,8 +46,8 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
             val endOfDay = DateTimeUtils.getEndOfDay(date)
             
             combine(
-                repository.getActiveMedicinesFlow(),
-                repository.getLogsForDateRange(startOfDay, endOfDay)
+                repository.getActiveMedicines(),
+                repository.getReminderLogsForDay(startOfDay, endOfDay)
             ) { medicines, logs ->
                 val items = mutableListOf<ReminderItem>()
                 
@@ -95,7 +96,7 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     fun updateReminderStatus(item: ReminderItem, status: LogStatus) {
         viewModelScope.launch {
             if (item.logId != 0L) {
-                val log = ReminderLog(
+                val log = ReminderLogEntity(
                     id = item.logId,
                     medicineId = item.medicineId,
                     medicineName = item.name,
@@ -104,9 +105,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                     status = status,
                     actionDateTime = System.currentTimeMillis()
                 )
-                repository.updateLog(log)
+                repository.updateReminderLog(log)
             } else {
-                val log = ReminderLog(
+                val log = ReminderLogEntity(
                     medicineId = item.medicineId,
                     medicineName = item.name,
                     dosage = item.dosage,
@@ -114,7 +115,7 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                     status = status,
                     actionDateTime = System.currentTimeMillis()
                 )
-                repository.insertLog(log)
+                repository.insertReminderLog(log)
             }
         }
     }

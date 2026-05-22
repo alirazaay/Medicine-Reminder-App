@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.example.medicinereminderapp.data.local.db.AppDatabase
+import com.example.medicinereminderapp.data.local.AppDatabase
 import com.example.medicinereminderapp.data.repository.MedicineRepositoryImpl
 import com.example.medicinereminderapp.util.AlarmScheduler
 import kotlinx.coroutines.CoroutineScope
@@ -19,11 +19,11 @@ class BootReceiver : BroadcastReceiver() {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED || intent.action == "android.intent.action.QUICKBOOT_POWERON") {
             Log.d(TAG, "Reboot detected. Rescheduling alarms...")
             val database = AppDatabase.getDatabase(context.applicationContext)
-            val repository = MedicineRepositoryImpl(database.medicineDao(), database.reminderLogDao())
+            val repository = MedicineRepositoryImpl(database.medicineDao, database.reminderLogDao)
 
             scope.launch {
                 try {
-                    val activeMedicines = repository.getActiveMedicines()
+                    val activeMedicines = repository.getActiveMedicinesList()
                     activeMedicines.forEach { medicine ->
                         AlarmScheduler.scheduleAlarmsForMedicine(context, medicine)
                     }

@@ -21,8 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.medicinereminderapp.data.model.LogStatus
-import com.example.medicinereminderapp.data.model.ReminderLog
+import com.example.medicinereminderapp.domain.model.LogStatus
+import com.example.medicinereminderapp.data.local.entity.ReminderLogEntity
 import com.example.medicinereminderapp.ui.theme.*
 import com.example.medicinereminderapp.util.DateTimeUtils
 import java.text.SimpleDateFormat
@@ -196,7 +196,7 @@ fun HistoryScreen(
 }
 
 @Composable
-fun HistoryLogCard(log: ReminderLog) {
+fun HistoryLogCard(log: ReminderLogEntity) {
     val indicatorColor = when (log.status) {
         LogStatus.TAKEN -> ColorTaken
         LogStatus.SKIPPED -> ColorSkipped

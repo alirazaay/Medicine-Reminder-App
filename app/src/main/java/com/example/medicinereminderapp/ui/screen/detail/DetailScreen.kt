@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.medicinereminderapp.data.model.MedicineType
+import com.example.medicinereminderapp.domain.model.MedicineType
 import com.example.medicinereminderapp.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.Date
