@@ -3,45 +3,54 @@ package com.example.medicinereminderapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.medicinereminderapp.data.local.AppDatabase
+import com.example.medicinereminderapp.data.repository.MedicineRepositoryImpl
+import com.example.medicinereminderapp.presentation.navigation.AppNavGraph
+import com.example.medicinereminderapp.presentation.viewmodel.MedicineViewModel
+import com.example.medicinereminderapp.presentation.viewmodel.ReminderLogViewModel
+import com.example.medicinereminderapp.presentation.viewmodel.ViewModelFactory
 import com.example.medicinereminderapp.ui.theme.MedicineReminderAppTheme
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        
+        val database = AppDatabase.getDatabase(this)
+        val repository = MedicineRepositoryImpl(database.medicineDao, database.reminderLogDao)
+        val factory = ViewModelFactory(repository)
+        
+        val medicineViewModel: MedicineViewModel by viewModels { factory }
+        val reminderLogViewModel: ReminderLogViewModel by viewModels { factory }
+
         setContent {
             MedicineReminderAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+                val snackbarHostState = remember { SnackbarHostState() }
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    snackbarHost = { SnackbarHost(snackbarHostState) }
+                ) { innerPadding ->
+                    androidx.compose.foundation.layout.Box(modifier = Modifier.padding(innerPadding)) {
+                        AppNavGraph(
+                            navController = navController,
+                            medicineViewModel = medicineViewModel,
+                            reminderLogViewModel = reminderLogViewModel,
+                            snackbarHostState = snackbarHostState
+                        )
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MedicineReminderAppTheme {
-        Greeting("Android")
     }
 }
