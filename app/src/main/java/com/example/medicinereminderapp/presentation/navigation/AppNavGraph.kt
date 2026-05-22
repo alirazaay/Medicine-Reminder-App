@@ -30,7 +30,8 @@ fun AppNavGraph(
     ) {
         composable(route = ScreenRoutes.Home.route) {
             HomeScreen(
-                viewModel = medicineViewModel,
+                medicineViewModel = medicineViewModel,
+                reminderLogViewModel = reminderLogViewModel,
                 onNavigateToAddEdit = {
                     navController.navigate(ScreenRoutes.AddEditMedicine.passMedicineId(-1L))
                 },
