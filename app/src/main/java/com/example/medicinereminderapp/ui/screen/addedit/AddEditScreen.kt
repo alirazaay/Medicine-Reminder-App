@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -113,7 +114,7 @@ fun AddEditScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
@@ -227,7 +228,9 @@ fun AddEditScreen(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = type.name.lowercase().capitalize(),
+                            text = type.name
+                                .lowercase(Locale.getDefault())
+                                .replaceFirstChar { it.titlecase(Locale.getDefault()) },
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,
                             color = if (isSelected) MaterialTheme.colorScheme.primary

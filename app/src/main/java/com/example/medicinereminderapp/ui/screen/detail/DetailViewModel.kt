@@ -9,9 +9,11 @@ import com.example.medicinereminderapp.data.repository.MedicineRepositoryImpl
 import com.example.medicinereminderapp.domain.model.LogStatus
 import com.example.medicinereminderapp.domain.repository.MedicineRepository
 import com.example.medicinereminderapp.util.AlarmScheduler
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
     private val database = AppDatabase.getDatabase(application)

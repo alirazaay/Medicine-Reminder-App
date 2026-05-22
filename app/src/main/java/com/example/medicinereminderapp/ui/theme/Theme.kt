@@ -41,6 +41,7 @@ fun MedicineReminderAppTheme(
     if (!view.isInEditMode) {
         val window = (view.context as? Activity)?.window
         window?.let {
+            @Suppress("DEPRECATION")
             it.statusBarColor = colorScheme.background.toArgb()
             val controller = WindowCompat.getInsetsController(it, view)
             controller.isAppearanceLightStatusBars = !darkTheme
