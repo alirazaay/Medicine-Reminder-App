@@ -1,11 +1,9 @@
 package com.example.medicinereminderapp.data.repository
 
-import com.example.medicinereminderapp.data.local.dao.MedicineDao
-import com.example.medicinereminderapp.data.local.dao.ReminderLogDao
-import com.example.medicinereminderapp.data.local.entity.MedicineEntity
-import com.example.medicinereminderapp.data.local.entity.ReminderLogEntity
-import com.example.medicinereminderapp.domain.model.LogStatus
-import com.example.medicinereminderapp.domain.repository.MedicineRepository
+import com.example.medicinereminderapp.data.local.db.dao.MedicineDao
+import com.example.medicinereminderapp.data.local.db.dao.ReminderLogDao
+import com.example.medicinereminderapp.data.model.Medicine
+import com.example.medicinereminderapp.data.model.ReminderLog
 import kotlinx.coroutines.flow.Flow
 
 class MedicineRepositoryImpl(
@@ -13,59 +11,35 @@ class MedicineRepositoryImpl(
     private val reminderLogDao: ReminderLogDao
 ) : MedicineRepository {
 
-    override suspend fun insertMedicine(medicine: MedicineEntity): Long {
-        return medicineDao.insertMedicine(medicine)
-    }
+    override fun getAllMedicines(): Flow<List<Medicine>> = medicineDao.getAllMedicines()
 
-    override suspend fun updateMedicine(medicine: MedicineEntity) {
-        medicineDao.updateMedicine(medicine)
-    }
+    override fun getActiveMedicinesFlow(): Flow<List<Medicine>> = medicineDao.getActiveMedicinesFlow()
 
-    override suspend fun deleteMedicine(medicine: MedicineEntity) {
-        medicineDao.deleteMedicine(medicine)
-    }
+    override suspend fun getActiveMedicines(): List<Medicine> = medicineDao.getActiveMedicines()
 
-    override fun getAllMedicines(): Flow<List<MedicineEntity>> {
-        return medicineDao.getAllMedicines()
-    }
+    override suspend fun getMedicineById(id: Long): Medicine? = medicineDao.getMedicineById(id)
 
-    override suspend fun getMedicineById(id: Long): MedicineEntity? {
-        return medicineDao.getMedicineById(id)
-    }
+    override fun getMedicineByIdFlow(id: Long): Flow<Medicine?> = medicineDao.getMedicineByIdFlow(id)
 
-    override fun getActiveMedicines(): Flow<List<MedicineEntity>> {
-        return medicineDao.getActiveMedicines()
-    }
+    override suspend fun insertMedicine(medicine: Medicine): Long = medicineDao.insertMedicine(medicine)
 
-    override suspend fun insertReminderLog(log: ReminderLogEntity): Long {
-        return reminderLogDao.insertLog(log)
-    }
+    override suspend fun updateMedicine(medicine: Medicine) = medicineDao.updateMedicine(medicine)
 
-    override suspend fun insertReminderLogs(logs: List<ReminderLogEntity>) {
-        reminderLogDao.insertLogs(logs)
-    }
+    override suspend fun deleteMedicine(medicine: Medicine) = medicineDao.deleteMedicine(medicine)
 
-    override suspend fun updateReminderLog(log: ReminderLogEntity) {
-        reminderLogDao.updateLog(log)
-    }
+    override fun getAllLogsFlow(): Flow<List<ReminderLog>> = reminderLogDao.getAllLogsFlow()
 
-    override suspend fun deleteReminderLog(log: ReminderLogEntity) {
-        reminderLogDao.deleteLog(log)
-    }
+    override fun getLogsForMedicine(medicineId: Long): Flow<List<ReminderLog>> = reminderLogDao.getLogsForMedicine(medicineId)
 
-    override fun getAllReminderLogs(): Flow<List<ReminderLogEntity>> {
-        return reminderLogDao.getAllLogs()
-    }
+    override fun getLogsForDateRange(start: Long, end: Long): Flow<List<ReminderLog>> = reminderLogDao.getLogsForDateRange(start, end)
 
-    override suspend fun getReminderLogById(id: Long): ReminderLogEntity? {
-        return reminderLogDao.getLogById(id)
-    }
+    override suspend fun getLogsForDateRangeSuspend(start: Long, end: Long): List<ReminderLog> = reminderLogDao.getLogsForDateRangeSuspend(start, end)
 
-    override fun getReminderLogsForDay(startOfDay: Long, endOfDay: Long): Flow<List<ReminderLogEntity>> {
-        return reminderLogDao.getLogsForDay(startOfDay, endOfDay)
-    }
+    override suspend fun insertLog(log: ReminderLog): Long = reminderLogDao.insertLog(log)
 
-    override suspend fun updateLogStatus(logId: Long, status: LogStatus, actionTime: Long) {
-        reminderLogDao.updateLogStatus(logId, status, actionTime)
-    }
+    override suspend fun updateLog(log: ReminderLog) = reminderLogDao.updateLog(log)
+
+    override suspend fun deleteLog(log: ReminderLog) = reminderLogDao.deleteLog(log)
+
+    override suspend fun getLogForScheduledTime(medicineId: Long, scheduledTime: Long): ReminderLog? = reminderLogDao.getLogForScheduledTime(medicineId, scheduledTime)
 }
