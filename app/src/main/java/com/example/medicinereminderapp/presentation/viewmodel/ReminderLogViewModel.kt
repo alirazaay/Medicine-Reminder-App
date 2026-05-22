@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 class ReminderLogViewModel(
     private val repository: MedicineRepository
@@ -29,7 +28,7 @@ class ReminderLogViewModel(
     val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
 
     init {
-        loadTodayReminders()
+        loadAllLogs()
     }
 
     fun onAction(action: UiAction) {
@@ -52,35 +51,8 @@ class ReminderLogViewModel(
         }
     }
 
-    fun loadLogsForDay(startOfDay: Long, endOfDay: Long) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            repository.getReminderLogsForDay(startOfDay, endOfDay)
-                .catch { e ->
-                    _uiState.update { it.copy(isLoading = false, error = e.message ?: "An error occurred") }
-                }
-                .collect { logs ->
-                    _uiState.update { it.copy(logs = logs, isLoading = false) }
-                }
-        }
-    }
-
-    fun loadTodayReminders() {
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-        val startOfDay = calendar.timeInMillis
-
-        calendar.set(Calendar.HOUR_OF_DAY, 23)
-        calendar.set(Calendar.MINUTE, 59)
-        calendar.set(Calendar.SECOND, 59)
-        calendar.set(Calendar.MILLISECOND, 999)
-        val endOfDay = calendar.timeInMillis
-
-        loadLogsForDay(startOfDay, endOfDay)
-    }
+    // Intentionally keep a single source of truth for logs to avoid
+    // screens overwriting each other's data.
 
     private fun updateLogStatus(logId: Long, status: LogStatus, actionTime: Long) {
         viewModelScope.launch {

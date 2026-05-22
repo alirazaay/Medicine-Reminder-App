@@ -73,9 +73,24 @@ fun HomeScreen(
         val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         val reminders = mutableListOf<TodayReminder>()
 
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val startOfDay = calendar.timeInMillis
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 59)
+        calendar.set(Calendar.MILLISECOND, 999)
+        val endOfDay = calendar.timeInMillis
+
+        val todayLogs = logState.logs.filter { it.scheduledDateTime in startOfDay..endOfDay }
+
         medState.medicines.filter { it.isActive }.forEach { medicine ->
             medicine.reminderTimes.forEach { timeStr ->
-                val logForTime = logState.logs.find { log ->
+                val logForTime = todayLogs.find { log ->
                     log.medicineId == medicine.id && dateFormat.format(Date(log.scheduledDateTime)) == timeStr
                 }
                 reminders.add(

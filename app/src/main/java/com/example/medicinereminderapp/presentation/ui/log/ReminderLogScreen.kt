@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
@@ -230,8 +231,8 @@ fun ReminderLogScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = null,
+                            imageVector = Icons.Default.KeyboardArrowUp,
+                            contentDescription = "Collapse",
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f)
                         )
                     }
