@@ -3,6 +3,7 @@ package com.example.medicinereminderapp.data.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.example.medicinereminderapp.data.local.AppDatabase
 import com.example.medicinereminderapp.data.local.entity.ReminderLogEntity
 import com.example.medicinereminderapp.data.notification.NotificationHelper
@@ -27,19 +28,27 @@ class AlarmReceiver : BroadcastReceiver() {
             val database = AppDatabase.getDatabase(context)
             
             CoroutineScope(Dispatchers.IO).launch {
-                val medicine = database.medicineDao.getMedicineById(medicineId)
-                if (medicine != null && medicine.isActive) {
-                    val log = ReminderLogEntity(
-                        medicineId = medicineId,
-                        medicineName = medicine.name,
-                        dosage = medicine.dosage,
-                        scheduledDateTime = System.currentTimeMillis(),
-                        status = LogStatus.PENDING
-                    )
-                    database.reminderLogDao.insertLog(log)
+                try {
+                    val medicine = database.medicineDao.getMedicineById(medicineId)
+                    if (medicine != null && medicine.isActive) {
+                        val log = ReminderLogEntity(
+                            medicineId = medicineId,
+                            medicineName = medicine.name,
+                            dosage = medicine.dosage,
+                            scheduledDateTime = System.currentTimeMillis(),
+                            status = LogStatus.PENDING
+                        )
+                        database.reminderLogDao.insertLog(log)
 
-                    val scheduler = ReminderSchedulerImpl(context)
-                    scheduler.scheduleReminder(medicine)
+                        val scheduler = ReminderSchedulerImpl(context)
+                        try {
+                            scheduler.scheduleReminder(medicine)
+                        } catch (e: SecurityException) {
+                            Log.e("AlarmReceiver", "Failed to schedule next exact alarm for ${medicine.name}", e)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("AlarmReceiver", "Error processing alarm", e)
                 }
             }
         }

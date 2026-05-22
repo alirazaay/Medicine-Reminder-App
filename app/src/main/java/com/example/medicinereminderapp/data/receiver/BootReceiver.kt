@@ -3,6 +3,7 @@ package com.example.medicinereminderapp.data.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.example.medicinereminderapp.data.local.AppDatabase
 import com.example.medicinereminderapp.data.scheduler.ReminderSchedulerImpl
 import kotlinx.coroutines.CoroutineScope
@@ -18,9 +19,17 @@ class BootReceiver : BroadcastReceiver() {
             val scheduler = ReminderSchedulerImpl(context)
 
             CoroutineScope(Dispatchers.IO).launch {
-                val activeMedicines = database.medicineDao.getActiveMedicines().firstOrNull()
-                activeMedicines?.forEach { medicine ->
-                    scheduler.scheduleReminder(medicine)
+                try {
+                    val activeMedicines = database.medicineDao.getActiveMedicines().firstOrNull()
+                    activeMedicines?.forEach { medicine ->
+                        try {
+                            scheduler.scheduleReminder(medicine)
+                        } catch (e: SecurityException) {
+                            Log.e("BootReceiver", "Failed to schedule exact alarm for ${medicine.name}", e)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("BootReceiver", "Error during boot rescheduling", e)
                 }
             }
         }

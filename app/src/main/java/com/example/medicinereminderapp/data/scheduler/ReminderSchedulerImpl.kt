@@ -19,73 +19,76 @@ class ReminderSchedulerImpl(
     override fun scheduleReminder(medicine: MedicineEntity) {
         cancelReminder(medicine.id)
 
-        if (!medicine.isActive) {
+        if (!medicine.isActive || medicine.reminderTimes.isEmpty()) {
             return
         }
 
-        medicine.reminderTimes.forEachIndexed { index, timeStr ->
+        val now = System.currentTimeMillis()
+        var nextAlarmTime = Long.MAX_VALUE
+
+        medicine.reminderTimes.forEach { timeStr ->
             val parts = timeStr.split(":")
             if (parts.size == 2) {
-                val hour = parts[0].toIntOrNull() ?: return@forEachIndexed
-                val minute = parts[1].toIntOrNull() ?: return@forEachIndexed
+                val hour = parts[0].toIntOrNull() ?: return@forEach
+                val minute = parts[1].toIntOrNull() ?: return@forEach
 
                 val calendar = Calendar.getInstance().apply {
                     set(Calendar.HOUR_OF_DAY, hour)
                     set(Calendar.MINUTE, minute)
                     set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
                 }
 
-                if (calendar.timeInMillis <= System.currentTimeMillis()) {
+                if (calendar.timeInMillis <= now) {
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
                 }
 
-                val intent = Intent(context, AlarmReceiver::class.java).apply {
-                    putExtra("MEDICINE_ID", medicine.id)
-                    putExtra("MEDICINE_NAME", medicine.name)
-                    putExtra("DOSAGE", medicine.dosage)
+                if (calendar.timeInMillis < nextAlarmTime) {
+                    nextAlarmTime = calendar.timeInMillis
                 }
+            }
+        }
 
-                val requestCode = (medicine.id.toInt() * 100) + index
+        if (nextAlarmTime != Long.MAX_VALUE) {
+            val intent = Intent(context, AlarmReceiver::class.java).apply {
+                putExtra("MEDICINE_ID", medicine.id)
+                putExtra("MEDICINE_NAME", medicine.name)
+                putExtra("DOSAGE", medicine.dosage)
+            }
 
-                val pendingIntent = PendingIntent.getBroadcast(
-                    context,
-                    requestCode,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            val requestCode = medicine.id.toInt()
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+                throw SecurityException("Exact alarm permission is missing. Cannot schedule medicine reminders safely.")
+            } else {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    nextAlarmTime,
+                    pendingIntent
                 )
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-                    alarmManager.set(
-                        AlarmManager.RTC_WAKEUP,
-                        calendar.timeInMillis,
-                        pendingIntent
-                    )
-                } else {
-                    alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        calendar.timeInMillis,
-                        pendingIntent
-                    )
-                }
             }
         }
     }
 
     override fun cancelReminder(medicineId: Long) {
-        for (index in 0..10) {
-            val requestCode = (medicineId.toInt() * 100) + index
-            val intent = Intent(context, AlarmReceiver::class.java)
-            val pendingIntent = PendingIntent.getBroadcast(
-                context,
-                requestCode,
-                intent,
-                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-            )
-            
-            if (pendingIntent != null) {
-                alarmManager.cancel(pendingIntent)
-                pendingIntent.cancel()
-            }
+        val intent = Intent(context, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            medicineId.toInt(),
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        if (pendingIntent != null) {
+            alarmManager.cancel(pendingIntent)
+            pendingIntent.cancel()
         }
     }
 }
