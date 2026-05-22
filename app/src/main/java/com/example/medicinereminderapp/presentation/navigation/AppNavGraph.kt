@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.medicinereminderapp.presentation.ui.add_edit.AddEditMedicineScreen
+import com.example.medicinereminderapp.presentation.ui.calendar.CalendarScreen
 import com.example.medicinereminderapp.presentation.ui.detail.MedicineDetailScreen
 import com.example.medicinereminderapp.presentation.ui.home.HomeScreen
 import com.example.medicinereminderapp.presentation.ui.log.ReminderLogScreen
@@ -40,6 +41,9 @@ fun AppNavGraph(
                 },
                 onNavigateToHistory = {
                     navController.navigate(ScreenRoutes.ReminderLog.route)
+                },
+                onNavigateToCalendar = {
+                    navController.navigate(ScreenRoutes.Calendar.route)
                 },
                 onNavigateToSettings = {
                     navController.navigate(ScreenRoutes.Settings.route)
@@ -89,6 +93,21 @@ fun AppNavGraph(
             ReminderLogScreen(
                 viewModel = reminderLogViewModel,
                 onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(route = ScreenRoutes.Calendar.route) {
+            CalendarScreen(
+                reminderLogViewModel = reminderLogViewModel,
+                onNavigateToHome = {
+                    navController.navigate(ScreenRoutes.Home.route)
+                },
+                onNavigateToHistory = {
+                    navController.navigate(ScreenRoutes.ReminderLog.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(ScreenRoutes.Settings.route)
+                }
             )
         }
 
