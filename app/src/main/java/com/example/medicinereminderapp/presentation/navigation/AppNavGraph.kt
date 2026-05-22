@@ -92,7 +92,15 @@ fun AppNavGraph(
         composable(route = ScreenRoutes.ReminderLog.route) {
             ReminderLogScreen(
                 viewModel = reminderLogViewModel,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateToHome = {
+                    navController.navigate(ScreenRoutes.Home.route)
+                },
+                onNavigateToCalendar = {
+                    navController.navigate(ScreenRoutes.Calendar.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(ScreenRoutes.Settings.route)
+                }
             )
         }
 
