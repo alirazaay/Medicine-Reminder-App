@@ -76,6 +76,7 @@ fun AppNavGraph(
             val medicineId = backStackEntry.arguments?.getLong("medicineId") ?: return@composable
             MedicineDetailScreen(
                 viewModel = medicineViewModel,
+                reminderLogViewModel = reminderLogViewModel,
                 medicineId = medicineId,
                 onNavigateBack = { navController.popBackStack() },
                 onEditClick = { id ->
