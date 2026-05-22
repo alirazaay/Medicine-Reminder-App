@@ -48,6 +48,7 @@ private data class DayStatus(
     val status: LogStatus?
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicineDetailScreen(
     viewModel: MedicineViewModel,

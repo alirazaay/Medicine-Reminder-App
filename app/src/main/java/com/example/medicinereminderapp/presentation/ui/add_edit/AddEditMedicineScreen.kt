@@ -68,6 +68,7 @@ import com.example.medicinereminderapp.presentation.event.UiEvent
 import com.example.medicinereminderapp.presentation.viewmodel.MedicineViewModel
 import com.example.medicinereminderapp.ui.theme.LightPrimary
 import kotlinx.coroutines.flow.collectLatest
+import androidx.compose.runtime.collectAsState
 import java.util.Locale
 
 private data class FormOption(
@@ -525,7 +526,7 @@ fun AddEditMedicineScreen(
 }
 
 @Composable
-private fun FrequencySegment(label: String, selected: Boolean, onClick: () -> Unit) {
+private fun RowScope.FrequencySegment(label: String, selected: Boolean, onClick: () -> Unit) {
     val background = if (selected) LightPrimary.copy(alpha = 0.12f) else Color.Transparent
     val border = if (selected) LightPrimary else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
     val textColor = if (selected) LightPrimary else MaterialTheme.colorScheme.onSurface
