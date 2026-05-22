@@ -38,6 +38,9 @@ fun AppNavGraph(
                 onNavigateToDetail = { id ->
                     navController.navigate(ScreenRoutes.MedicineDetail.passMedicineId(id))
                 },
+                onNavigateToHistory = {
+                    navController.navigate(ScreenRoutes.ReminderLog.route)
+                },
                 onNavigateToSettings = {
                     navController.navigate(ScreenRoutes.Settings.route)
                 }
