@@ -18,6 +18,7 @@ import com.example.medicinereminderapp.presentation.navigation.AppNavGraph
 import com.example.medicinereminderapp.presentation.viewmodel.MedicineViewModel
 import com.example.medicinereminderapp.presentation.viewmodel.ReminderLogViewModel
 import com.example.medicinereminderapp.presentation.viewmodel.ViewModelFactory
+import com.example.medicinereminderapp.data.scheduler.ReminderSchedulerImpl
 import com.example.medicinereminderapp.ui.theme.MedicineReminderAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -27,7 +28,8 @@ class MainActivity : ComponentActivity() {
         
         val database = AppDatabase.getDatabase(this)
         val repository = MedicineRepositoryImpl(database.medicineDao, database.reminderLogDao)
-        val factory = ViewModelFactory(repository)
+        val scheduler = ReminderSchedulerImpl(this)
+        val factory = ViewModelFactory(repository, scheduler)
         
         val medicineViewModel: MedicineViewModel by viewModels { factory }
         val reminderLogViewModel: ReminderLogViewModel by viewModels { factory }
