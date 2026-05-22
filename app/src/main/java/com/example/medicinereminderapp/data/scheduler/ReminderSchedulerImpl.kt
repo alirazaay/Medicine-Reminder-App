@@ -17,8 +17,9 @@ class ReminderSchedulerImpl(
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     override fun scheduleReminder(medicine: MedicineEntity) {
+        cancelReminder(medicine.id)
+
         if (!medicine.isActive) {
-            cancelReminder(medicine.id)
             return
         }
 
