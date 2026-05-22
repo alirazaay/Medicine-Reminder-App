@@ -122,7 +122,15 @@ fun AppNavGraph(
         composable(route = ScreenRoutes.Settings.route) {
             SettingsScreen(
                 viewModel = settingsViewModel,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateToHome = {
+                    navController.navigate(ScreenRoutes.Home.route)
+                },
+                onNavigateToCalendar = {
+                    navController.navigate(ScreenRoutes.Calendar.route)
+                },
+                onNavigateToHistory = {
+                    navController.navigate(ScreenRoutes.ReminderLog.route)
+                }
             )
         }
     }
