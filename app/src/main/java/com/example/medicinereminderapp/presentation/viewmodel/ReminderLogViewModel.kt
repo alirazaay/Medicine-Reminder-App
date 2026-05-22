@@ -34,6 +34,7 @@ class ReminderLogViewModel(
     fun onAction(action: UiAction) {
         when (action) {
             is UiAction.UpdateLogStatus -> updateLogStatus(action.logId, action.status, action.actionTime)
+            is UiAction.AddLogAndMarkTaken -> addLogAndMarkTaken(action.medicineId, action.scheduledTime, action.actionTime)
             else -> Unit
         }
     }
@@ -61,6 +62,26 @@ class ReminderLogViewModel(
                 _uiEvent.emit(UiEvent.ShowSnackbar("Status updated to ${status.name}"))
             } catch (e: Exception) {
                 _uiEvent.emit(UiEvent.ShowSnackbar("Failed to update status"))
+            }
+        }
+    }
+
+    private fun addLogAndMarkTaken(medicineId: Long, scheduledTime: Long, actionTime: Long) {
+        viewModelScope.launch {
+            try {
+                val med = repository.getMedicineById(medicineId) ?: return@launch
+                val newLog = com.example.medicinereminderapp.data.local.entity.ReminderLogEntity(
+                    medicineId = medicineId,
+                    medicineName = med.name,
+                    dosage = med.dosage,
+                    scheduledDateTime = scheduledTime,
+                    actionDateTime = actionTime,
+                    status = LogStatus.TAKEN
+                )
+                repository.insertReminderLog(newLog)
+                _uiEvent.emit(UiEvent.ShowSnackbar("Marked as taken"))
+            } catch (e: Exception) {
+                _uiEvent.emit(UiEvent.ShowSnackbar("Failed to mark as taken"))
             }
         }
     }

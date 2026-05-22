@@ -12,4 +12,5 @@ sealed class UiAction {
     
     // Log Actions
     data class UpdateLogStatus(val logId: Long, val status: LogStatus, val actionTime: Long) : UiAction()
+    data class AddLogAndMarkTaken(val medicineId: Long, val scheduledTime: Long, val actionTime: Long) : UiAction()
 }

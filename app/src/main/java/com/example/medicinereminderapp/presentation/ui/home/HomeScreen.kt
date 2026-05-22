@@ -49,11 +49,13 @@ import java.util.Locale
 
 data class TodayReminder(
     val medicineId: Long,
+    val logId: Long?,
     val name: String,
     val dosage: String,
     val time: String,
     val status: LogStatus?,
-    val instructions: String
+    val instructions: String,
+    val scheduledTime: Long
 )
 
 @Composable
@@ -90,17 +92,30 @@ fun HomeScreen(
 
         medState.medicines.filter { it.isActive }.forEach { medicine ->
             medicine.reminderTimes.forEach { timeStr ->
+                val parts = timeStr.split(":")
+                val hour = parts.getOrNull(0)?.toIntOrNull() ?: 0
+                val min = parts.getOrNull(1)?.toIntOrNull() ?: 0
+                val timeCal = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, hour)
+                    set(Calendar.MINUTE, min)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+                val scheduledTimeMs = timeCal.timeInMillis
+
                 val logForTime = todayLogs.find { log ->
                     log.medicineId == medicine.id && dateFormat.format(Date(log.scheduledDateTime)) == timeStr
                 }
                 reminders.add(
                     TodayReminder(
                         medicineId = medicine.id,
+                        logId = logForTime?.id,
                         name = medicine.name,
                         dosage = medicine.dosage,
                         time = timeStr,
                         status = logForTime?.status,
-                        instructions = medicine.instructions
+                        instructions = medicine.instructions,
+                        scheduledTime = scheduledTimeMs
                     )
                 )
             }
@@ -263,7 +278,23 @@ fun HomeScreen(
                 UpNextCard(
                     reminder = upcomingReminder,
                     onTakeNow = { reminder ->
-                        onNavigateToDetail(reminder.medicineId)
+                        if (reminder.logId != null) {
+                            reminderLogViewModel.onAction(
+                                com.example.medicinereminderapp.presentation.event.UiAction.UpdateLogStatus(
+                                    logId = reminder.logId,
+                                    status = LogStatus.TAKEN,
+                                    actionTime = System.currentTimeMillis()
+                                )
+                            )
+                        } else {
+                            reminderLogViewModel.onAction(
+                                com.example.medicinereminderapp.presentation.event.UiAction.AddLogAndMarkTaken(
+                                    medicineId = reminder.medicineId,
+                                    scheduledTime = reminder.scheduledTime,
+                                    actionTime = System.currentTimeMillis()
+                                )
+                            )
+                        }
                     }
                 )
             }
