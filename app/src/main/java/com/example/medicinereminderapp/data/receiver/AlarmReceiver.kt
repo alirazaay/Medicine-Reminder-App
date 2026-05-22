@@ -22,9 +22,6 @@ class AlarmReceiver : BroadcastReceiver() {
         val notificationId = medicineId.toInt()
 
         if (medicineId != -1L) {
-            val notificationHelper = NotificationHelper(context)
-            notificationHelper.showReminderNotification(notificationId, medicineName, dosage)
-
             val database = AppDatabase.getDatabase(context)
             
             CoroutineScope(Dispatchers.IO).launch {
@@ -38,7 +35,10 @@ class AlarmReceiver : BroadcastReceiver() {
                             scheduledDateTime = System.currentTimeMillis(),
                             status = LogStatus.PENDING
                         )
-                        database.reminderLogDao.insertLog(log)
+                        val logId = database.reminderLogDao.insertLog(log)
+
+                        val notificationHelper = NotificationHelper(context)
+                        notificationHelper.showReminderNotification(notificationId, logId, medicineName, dosage)
 
                         val scheduler = ReminderSchedulerImpl(context)
                         try {
